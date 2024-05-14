@@ -1,6 +1,10 @@
 import * as net from 'net';
 
 const server = net.createServer((socket) => {
+  const res = 'HTTP/1.1 200 OK\r\n\r\n';
+
+  socket.write(res);
+  socket.pipe(socket);
   socket.end();
 });
 
@@ -9,7 +13,5 @@ console.log('Logs from your program will appear here!');
 
 // Uncomment this to pass the first stage
 server.listen(4221, 'localhost', () => {
-  const res = 'HTTP/1.1 200 OK\r\n\r\n';
-
-  return res; // ??
+  console.log('server is listening on localhost:4221');
 });
