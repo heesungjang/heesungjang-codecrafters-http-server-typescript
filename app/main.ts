@@ -1,11 +1,23 @@
 import * as net from 'net';
 
 const server = net.createServer((socket) => {
-  const res = 'HTTP/1.1 200 OK\r\n\r\n';
+  socket.on('data', (data) => {
+    const [request] = data.toString().split('\r\n');
+    const [httpMethod, requestTarget, HttpVersion] = request.split(' ');
 
-  socket.write(res);
-  socket.pipe(socket);
-  socket.end();
+    if (requestTarget === '/') {
+      const res = 'HTTP/1.1 200 OK\r\n\r\n';
+      socket.write(res);
+    } else {
+      const res = 'HTTP/1.1 404 Not Found\r\n\r\n';
+      socket.write(res);
+    }
+
+    socket.pipe(socket);
+    socket.end();
+  });
+
+  // const address = connection.address();
 });
 
 // You can use print statements as follows for debugging, they'll be visible when running tests.
