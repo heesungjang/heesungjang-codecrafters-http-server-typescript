@@ -20,6 +20,7 @@ const server = net.createServer((socket) => {
       }
       case ENDPOINT.echo: {
         const echoContent = params.join('').slice(1); // Remove leading slash
+        console.log('echoContent::', echoContent);
         const res = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${echoContent.length}\r\n\r\n${echoContent}`;
         socket.write(Buffer.from(res));
         break;
