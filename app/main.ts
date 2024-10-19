@@ -1,16 +1,34 @@
 import * as net from 'net';
 
+const ENDPOINT = {
+  root: '/',
+  echo: '/echo',
+};
+
 const server = net.createServer((socket) => {
   socket.on('data', (data) => {
     const [request] = data.toString().split('\r\n');
     const [httpMethod, requestTarget, HttpVersion] = request.split(' ');
 
-    if (requestTarget === '/') {
-      const res = 'HTTP/1.1 200 OK\r\n\r\n';
-      socket.write(res);
-    } else {
-      const res = 'HTTP/1.1 404 Not Found\r\n\r\n';
-      socket.write(res);
+    const [endpoint, ...params] = requestTarget.split(/(?=\/)/).filter(Boolean);
+
+    switch (endpoint) {
+      case ENDPOINT.root: {
+        const res = 'HTTP/1.1 200 OK\r\n\r\n';
+        socket.write(Buffer.from(res));
+        break;
+      }
+      case ENDPOINT.echo: {
+        const echoContent = params.join('').slice(1); // Remove leading slash
+        const res = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${echoContent.length}\r\n\r\n${echoContent}`;
+        socket.write(Buffer.from(res));
+        break;
+      }
+
+      default: {
+        const res = 'HTTP/1.1 404 Not Found\r\n\r\n';
+        socket.write(Buffer.from(res));
+      }
     }
 
     socket.pipe(socket);
